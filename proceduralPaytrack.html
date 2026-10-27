@@ -208,7 +208,10 @@
                 <span id="philHealthResult"></span>
             </div>
 
-           
+            <div class="payslip-row">
+                <span>Total Deduction</span>
+                <span id="deductionResult"></span>
+            </div>
             
         </div>
 
@@ -259,7 +262,9 @@
                 return gross - deductions;
             }
 
-            
+            calculateDeduction(){
+                return this.calculatePhilHealth() + this.calculateSSS();
+            }
         }
 
         function calculateSalary() {
@@ -311,7 +316,9 @@
             document.getElementById("netResult").textContent =
                 "₱" + emp.calculateNetPay().toFixed(2);
             
-            
+            document.getElementById("deductionResult").textContent = 
+                "₱" + emp.calculateDeduction().toFixed(2);
+
             document.getElementById("formPage").style.display = "none";
             document.getElementById("resultPage").style.display = "flex";
         }
