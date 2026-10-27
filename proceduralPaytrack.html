@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>PayTrack: Salary and Deduction Management System</title>
+
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: #f8fafc;
+            color: #111111;
+            max-width: 420px;
+            margin: 50px auto;
+            padding: 0 20px;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 24px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        h2 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #1e293b;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px 0;
+            border: none;
+            border-bottom: 2px solid #cbd5e1;
+            background: transparent;
+            font-size: 0.95rem;
+            outline: none;
+            box-sizing: border-box;
+            transition: border-color 0.2s;
+        }
+
+        input:focus {
+            border-bottom-color: #2563eb;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #2563eb;
+            color: #ffffff;
+            border: none;
+            border-radius: 5px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 8px;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background-color: #1d4ed8;
+        }
+
+        .payslip-header {
+            background-color: #1e3a8a;
+            color: white;
+            text-align: center;
+            padding: 20px 12px;
+            border-radius: 6px;
+        }
+
+        .payslip-header h2 {
+            color: white;
+            margin: 0 0 5px;
+            font-size: 1.5rem;
+            letter-spacing: 2px;
+        }
+
+        .payslip-header p {
+            color: #dbeafe;
+            margin: 0;
+            font-size: 0.85rem;
+        }
+
+        .section-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #64748b;
+            letter-spacing: 1px;
+            margin: 8px 0 4px;
+        }
+
+        .employee-details {
+            background: #f8fafc;
+            padding: 12px;
+            border-radius: 5px;
+        }
+
+        .employee-details p {
+            margin: 5px 0;
+        }
+
+        .payslip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 0.9rem;
+        }
+
+        .payslip-row span:first-child {
+            color: #475569;
+        }
+
+        .payslip-row span:last-child {
+            font-weight: 600;
+            color: #1e293b;
+            text-align: right;
+        }
+
+        .net-salary {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 6px;
+            padding: 16px;
+            margin-top: 8px;
+            text-align: center;
+        }
+
+        .net-salary p {
+            color: #1d4ed8;
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin: 0 0 6px;
+        }
+
+        .net-salary h3 {
+            color: #1d4ed8;
+            font-size: 1.6rem;
+            margin: 0;
+            overflow-wrap: anywhere;
+        }
+
+        .back-button {
+            background-color: #475569;
+        }
+
+        .back-button:hover {
+            background-color: #334155;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container" id="formPage">
+        <h2>Enter your Employee Information</h2>
+
+        <input type="text" id="name" placeholder="Employee Name">
+        <input type="text" id="rate" placeholder="Daily Rate">
+        <input type="text" id="days" placeholder="Days Worked">
+        <input type="text" id="time" placeholder="Overtime (Hours)">
+
+        <button onclick="calculateSalary()">Calculate</button>
+    </div>
+
+    <div class="container" id="resultPage" style="display: none;">
+
+        <div class="payslip-header">
+            <h2>PAYTRACK</h2>
+            <p>EMPLOYEE SALARY PAYSLIP</p>
+        </div>
+
+        <div>
+            <p class="section-title">EMPLOYEE DETAILS</p>
+
+            <div class="employee-details">
+                <p id="nameResult"></p>
+            </div>
+        </div>
+
+        <div>
+            <p class="section-title">EARNINGS</p>
+
+            <div class="payslip-row">
+                <span>Gross Salary</span>
+                <span id="grossResult"></span>
+            </div>
+        </div>
+
+        <div>
+            <p class="section-title">DEDUCTIONS</p>
+
+            <div class="payslip-row">
+                <span>SSS (10%)</span>
+                <span id="sssResult"></span>
+            </div>
+
+            <div class="payslip-row">
+                <span>PhilHealth (2.5%)</span>
+                <span id="philHealthResult"></span>
+            </div>
+
+           
+            
+        </div>
+
+        <div class="net-salary">
+            <p>NET SALARY</p>
+            <h3 id="netResult"></h3>
+        </div>
+
+        <button class="back-button" onclick="backToForm()">
+            Back to Form
+        </button>
+    </div>
+
+    <script>
+        class GrossSalary {
+            constructor(name, rate, days, time) {
+                this.name = name;
+                this.dailyRate = Number(rate);
+                this.days = Number(days);
+                this.time = Number(time);
+            }
+
+            calculateSalary() {
+                let basePay = this.dailyRate * this.days;
+                let hourlyRate = this.dailyRate / 8;
+                let overtimePay = this.time * hourlyRate;
+
+                return basePay + overtimePay;
+            }
+        }
+
+        class NetSalary extends GrossSalary {
+
+            calculateSSS() {
+                return this.calculateSalary() * 0.10;
+            }
+
+            calculatePhilHealth() {
+                return this.calculateSalary() * 0.025;
+            }
+
+            calculateNetPay() {
+                let gross = this.calculateSalary();
+
+                let deductions = this.calculateSSS()
+                    + this.calculatePhilHealth();
+
+                return gross - deductions;
+            }
+
+            
+        }
+
+        function calculateSalary() {
+            let name = document.getElementById("name").value.trim();
+            let rate = document.getElementById("rate").value.trim();
+            let days = document.getElementById("days").value.trim();
+            let time = document.getElementById("time").value.trim();
+
+            if (name === "") {
+                alert("Please enter an employee name.");
+                return;
+            }
+
+            if (rate === "" || days === "" || time === "") {
+                alert("Please fill in all salary information.");
+                return;
+            }
+
+            if (
+                !Number.isFinite(Number(rate)) ||
+                !Number.isFinite(Number(days)) ||
+                !Number.isFinite(Number(time))
+            ) {
+                alert("Please enter valid numbers.");
+                return;
+            }
+
+            if (Number(rate) < 0 ||
+                Number(days) < 0 ||
+                Number(time) < 0) {
+                alert("Please enter values that are not negative.");
+                return;
+            }
+
+            let emp = new NetSalary(name, rate, days, time);
+
+            document.getElementById("nameResult").textContent =
+                "Employee Name: " + emp.name;
+
+            document.getElementById("grossResult").textContent =
+                "₱" + emp.calculateSalary().toFixed(2);
+
+            document.getElementById("sssResult").textContent =
+                "₱" + emp.calculateSSS().toFixed(2);
+
+            document.getElementById("philHealthResult").textContent =
+                "₱" + emp.calculatePhilHealth().toFixed(2);
+
+            document.getElementById("netResult").textContent =
+                "₱" + emp.calculateNetPay().toFixed(2);
+            
+            
+            document.getElementById("formPage").style.display = "none";
+            document.getElementById("resultPage").style.display = "flex";
+        }
+
+        function backToForm() {
+            document.getElementById("resultPage").style.display = "none";
+            document.getElementById("formPage").style.display = "flex";
+        }
+    </script>
+
+</body>
+</html>
